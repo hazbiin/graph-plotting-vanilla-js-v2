@@ -25,6 +25,10 @@ addNewBtn.addEventListener("click", () => {
                         <p>y-axis:</p>
                         <input class="input-box y-axis-input" type="number"/>
                     </div>
+                    <div class="input-container">
+                        <p>fill-color:</p>
+                        <input class="input-box fill-color-input" type="color"/>
+                    </div>
                 </div>
                 
                 <div class="input-group">
@@ -59,6 +63,7 @@ addNewBtn.addEventListener("click", () => {
     const xInput = newTemplate.querySelector('.x-axis-input');
     const YInput = newTemplate.querySelector('.y-axis-input');
 
+    const fillColorInput = newTemplate.querySelector('.fill-color-input');
 
     // assigning same objects to a variable and both refers to the same memory
     const state = newTemplate.stateObj = {
@@ -80,6 +85,7 @@ addNewBtn.addEventListener("click", () => {
         const maxY = Number(maxYSize.value); // y axis length
         const xToPlot = xInput.value;
         const yToPlot = YInput.value;
+        const fillColor = fillColorInput.value;
 
         const drawConfigObj = {
             maxX,
@@ -100,7 +106,8 @@ addNewBtn.addEventListener("click", () => {
             maxY,
             gridContainer,
             actionBtn,
-            state
+            state,
+            fillColor,
         }
 
         const clearConfigObj = {
@@ -207,7 +214,7 @@ function draw({maxX, maxY, gridContainer, maxXSize, maxYSize, xInput, YInput, ac
 
 
 // ---------------mark funciton----------------------------
-function mark({xToPlot, yToPlot, maxX, maxY, gridContainer,actionBtn, state }) {
+function mark({xToPlot, yToPlot, maxX, maxY, gridContainer,actionBtn, state, fillColor }) {
     // console.log(xToPlot, yToPlot, maxX, maxY, gridContainer,actionBtn, state);
 
     // validation of empty inputs.
@@ -232,11 +239,11 @@ function mark({xToPlot, yToPlot, maxX, maxY, gridContainer,actionBtn, state }) {
         
         for(let i = 0; i <= y; i++) {
             const blockToColor = gridContainer.querySelector(`[data-xy = "${x},${i}"]`);
-            blockToColor.style.backgroundColor = "blueviolet";
+            blockToColor.style.backgroundColor = `${fillColor}`;
         }
        
         actionBtn.textContent = "Clear";
-
+        
         // changing states
         state.markState = false;
         state.clearState = true;
