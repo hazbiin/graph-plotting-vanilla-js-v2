@@ -27,7 +27,7 @@ addNewBtn.addEventListener("click", () => {
                     </div>
                     <div class="input-container">
                         <p>fill-color:</p>
-                        <input class="input-box fill-color-input" type="color"/>
+                        <input class="input-box fill-color-input" type="color" value="#8A2BE2"/>
                     </div>
                 </div>
                 
@@ -50,121 +50,99 @@ addNewBtn.addEventListener("click", () => {
             </div>
         </div>
     `;
-
     templatesContainer.appendChild(newTemplate);
 
     const gridContainer = newTemplate.querySelector('.grid-container');
     const actionBtn = newTemplate.querySelector('.action-btn');
     const resetBtn = newTemplate.querySelector('.reset-btn');
     
-    const maxXSize = newTemplate.querySelector('.max-X-input');
-    const maxYSize = newTemplate.querySelector('.max-Y-input');
+    const maxXInput = newTemplate.querySelector('.max-X-input');
+    const maxYInput = newTemplate.querySelector('.max-Y-input');
 
     const xInput = newTemplate.querySelector('.x-axis-input');
-    const YInput = newTemplate.querySelector('.y-axis-input');
+    const yInput = newTemplate.querySelector('.y-axis-input');
 
     const fillColorInput = newTemplate.querySelector('.fill-color-input');
 
     // assigning same objects to a variable and both refers to the same memory
-    const state = newTemplate.stateObj = {
+    const states = newTemplate.stateObj = {
         drawState : true,
         markState : false,
         clearState : false,
     }
-
-    if(state.drawState) {
-        xInput.disabled = true;
-        YInput.disabled = true;
-    }
-
-    // attaching event handlers 
-    actionBtn.addEventListener("click", () => {
-
-        // taking inputs
-        const maxX = Number(maxXSize.value); // x axis length
-        const maxY = Number(maxYSize.value); // y axis length
-        const xToPlot = xInput.value;
-        const yToPlot = YInput.value;
-        const fillColor = fillColorInput.value;
-
-        const drawConfigObj = {
-            maxX,
-            maxY,
-            gridContainer,
-            maxXSize,
-            maxYSize,
-            xInput,
-            YInput,
-            actionBtn,
-            state
-        }
-
-        const markConfigObj = {
-            xToPlot,
-            yToPlot,
-            maxX,
-            maxY,
-            gridContainer,
-            actionBtn,
-            state,
-            fillColor,
-        }
-
-        const clearConfigObj = {
-            xToPlot,
-            yToPlot,
-            gridContainer,
-            actionBtn,
-            state,
-            xInput,
-            YInput
-        }
-
-        // calling function based on states 
-        if(state.drawState) {
-            // draw(maxX, maxY, gridContainer);
-
-            draw(drawConfigObj);
-            console.log(state); // draw state false and mark state is true
-
-        }else if(state.markState) {
-            // mark(xToPlot, yToPlot, maxX, maxY);
-
-            mark(markConfigObj);
-            console.log(state) // mark state is false and clear state is true 
-
-        }else if(state.clearState) {
-            // clear(xToPlot, yToPlot);   
-
-            clear(clearConfigObj)
-            console.log(state) // clear state is false and mark state is true 
-        }
-    })
-
-
-    const resetStateObj = {
+    const fields = {
         gridContainer,
         actionBtn,
-        maxXSize,
-        maxYSize,
+        maxXInput,
+        maxYInput,
         xInput,
-        YInput,
-        state
+        yInput,
+        fillColorInput
+    }
+    const inputs = {
+        maxX: null,
+        maxY: null,
+        xToPlot: null,
+        yToPlot: null,
+        fillColor: null,
     }
 
-    resetBtn.addEventListener("click", () => {
-        if(state.markState) {
+    // final object which is passed into functions
+    const allConfigObj = {
+        inputs,
+        fields,
+        states
+    }
 
+    if(states.drawState) {
+        xInput.disabled = true;
+        yInput.disabled = true;
+        fillColorInput.disabled = true;
+    }
+
+    // ---------------action button event handler --------------
+    actionBtn.addEventListener("click", () => {
+        // taking inputs
+        inputs.maxX = Number(maxXInput.value); // x axis length
+        inputs.maxY = Number(maxYInput.value); // y axis length
+        inputs.xToPlot = xInput.value;
+        inputs.yToPlot = yInput.value;
+        inputs.fillColor = fillColorInput.value;
+
+        // calling function based on states 
+        if(states.drawState) {
+            // draw(maxX, maxY, gridContainer);
+
+            draw(allConfigObj);
+            // console.log(state); // draw state false and mark state is true
+
+        }else if(states.markState) {
+            // mark(xToPlot, yToPlot, maxX, maxY);
+
+            mark(allConfigObj);
+            // console.log(state) // mark state is false and clear state is true 
+
+        }else if(states.clearState) {
+            // clear(xToPlot, yToPlot);   
+
+            clear(allConfigObj);
+            // console.log(state) // clear state is false and mark state is true 
+        }
+    })
+    // ---------------reset btn event handler --------------------
+    resetBtn.addEventListener("click", () => {
+        if(states.markState) {
             // console.log("from mark state herere");
-            resetState(resetStateObj);
-            state.markState = false;
+
+            resetState(allConfigObj)
+            states.markState = false;  
             // console.log("new state",state);
 
-        }else if(state.clearState) {
+        }else if(states.clearState) {
+            // console.log("from clear state");
 
-            // console.log("from clear state")
-            resetState(resetStateObj)
-            state.clearState = false;
+            resetState(allConfigObj)
+            states.clearState = false;
             // console.log("new state",state);
 
         }else {
@@ -174,121 +152,124 @@ addNewBtn.addEventListener("click", () => {
 })
 
 // ----------------draw function------------------------
-function draw({maxX, maxY, gridContainer, maxXSize, maxYSize, xInput, YInput, actionBtn, state}) {
-    // console.log(maxX, maxY, gridContainer, maxXSize, maxYSize, xInput, YInput, actionBtn, state)
+function draw({inputs, fields, states}) {
+    console.log(inputs, fields, states);
 
-    if(!maxX || !maxY || (maxX <= 0) || (maxY <= 0)) {
+    if(!inputs.maxX || !inputs.maxY || (inputs.maxX <= 0) || (inputs.maxY <= 0)) {
         alert("Invalid grid dimensions specified!");
         return;
     }
 
     // in grid rows and columns are flipping
-    gridContainer.style.display = 'grid';
-    gridContainer.style.gridTemplateRows = `repeat(${maxY}, minmax(10px, 50px))`;
-    gridContainer.style.gridTemplateColumns = `repeat(${maxX}, minmax(10px, 50px))`;
-    gridContainer.innerHTML = "";
+    fields.gridContainer.style.display = 'grid';
+    fields.gridContainer.style.gridTemplateRows = `repeat(${inputs.maxY}, minmax(10px, 50px))`;
+    fields.gridContainer.style.gridTemplateColumns = `repeat(${inputs.maxX}, minmax(10px, 50px))`;
+    fields.gridContainer.innerHTML = "";
 
     // populating with blocks 
-    for(let i = maxY - 1; i >= 0; i--) { //row
-        for(let j = 0; j < maxX; j++) { //column
+    for(let i = inputs.maxY - 1; i >= 0; i--) { //row
+        for(let j = 0; j < inputs.maxX; j++) { //column
             const block = document.createElement("div");
             block.classList.add('block');
             block.dataset.xy = `${j},${i}`;
             block.textContent = `${j},${i}`;
-            gridContainer.appendChild(block);
+            fields.gridContainer.appendChild(block);
         }
     }
 
-    actionBtn.textContent = "Mark";
-    actionBtn.classList.add("clicked");
-    maxXSize.disabled = true;
-    maxYSize.disabled = true;
+    fields.actionBtn.textContent = "Mark";
+    fields.actionBtn.classList.add("clicked");
+    fields.maxXInput.disabled = true;
+    fields.maxYInput.disabled = true;
 
-    xInput.disabled = false;
-    YInput.disabled = false;
+    fields.xInput.disabled = false;
+    fields.yInput.disabled = false;
+    fields.fillColorInput.disabled = false;
 
     // changing states
-    state.drawState = false;
-    state.markState = true;
+    states.drawState = false;
+    states.markState = true;
 }
 
 
 // ---------------mark funciton----------------------------
-function mark({xToPlot, yToPlot, maxX, maxY, gridContainer,actionBtn, state, fillColor }) {
-    // console.log(xToPlot, yToPlot, maxX, maxY, gridContainer,actionBtn, state);
+function mark({inputs, fields, states}) {
+    // console.log(inputs, fields, states);
 
     // validation of empty inputs.
-    if(xToPlot === "" || yToPlot === "") {
+    if(inputs.xToPlot === "" || inputs.yToPlot === "") {
         alert("x and y points are required for marking!");
         return;
     }
 
     // converting to number and proceeding, as 0 is valid in our case
-    let x = Number(xToPlot);
-    let y = Number(yToPlot);
+    let x = Number(inputs.xToPlot);
+    let y = Number(inputs.yToPlot);
 
 
     // validation of correct x and y points
-    if((x >= maxX) || (y >= maxY) || (x < 0) || (y < 0)) {
+    if((x >= inputs.maxX) || (y >= inputs.maxY) || (x < 0) || (y < 0)) {
         alert("x or y point does not includes in the grid generated");
         return;
     }
 
     // only mark if these conditions met
-    if(x!== null && y!== null && (x < maxX) && (y < maxY)) {
+    if(x!== null && y!== null && (x < inputs.maxX) && (y < inputs.maxY)) {
         
         for(let i = 0; i <= y; i++) {
-            const blockToColor = gridContainer.querySelector(`[data-xy = "${x},${i}"]`);
-            blockToColor.style.backgroundColor = `${fillColor}`;
+            const blockToColor = fields.gridContainer.querySelector(`[data-xy = "${x},${i}"]`);
+            blockToColor.style.backgroundColor = `${inputs.fillColor}`;
         }
-       
-        actionBtn.textContent = "Clear";
         
+        fields.actionBtn.textContent = "Clear";
+
         // changing states
-        state.markState = false;
-        state.clearState = true;
+        states.markState = false;
+        states.clearState = true;
     }
 }
 
 // ------------clear function--------------------
-function clear({xToPlot, yToPlot, gridContainer, actionBtn, state, xInput, YInput}) {
-    // console.log(xToPlot, yToPlot, gridContainer, actionBtn, state, xInput, YInput)
+function clear({inputs, fields, states}) {
+    // console.log(inputs, fields, states)
 
-    for(let i = 0; i <= yToPlot; i++) {
-        const blockToColor = gridContainer.querySelector(`[data-xy = "${xToPlot},${i}"]`);
+    for(let i = 0; i <= inputs.yToPlot; i++) {
+        const blockToColor = fields.gridContainer.querySelector(`[data-xy = "${inputs.xToPlot},${i}"]`);
         blockToColor.style.backgroundColor = "";
     }
 
-    actionBtn.textContent = "Mark";
-    xInput.value = '';
-    YInput.value = '';
+    fields.actionBtn.textContent = "Mark";
+    fields.xInput.value = '';
+    fields.yInput.value = '';
+    fields.fillColorInput.value = '#8A2BE2';
 
     // changing states
-    state.clearState = false;
-    state.markState = true;
+    states.clearState = false;
+    states.markState = true;
 }
 
 // ---------------reset funciton------------------
-function resetState({gridContainer, actionBtn, maxXSize, maxYSize, xInput, YInput, state}) {
-    gridContainer.innerHTML = "";
-    gridContainer.style.display = 'none';
-    actionBtn.textContent = "Draw";
-    actionBtn.classList.remove("clicked");
+function resetState({inputs, fields, states}) {
+    // console.log(inputs, fields, states);
 
-    maxXSize.disabled = false;
-    maxYSize.disabled = false;
-    maxXSize.value = "";
-    maxYSize.value = "";
+    fields.gridContainer.innerHTML = "";
+    fields.gridContainer.style.display = 'none';
+    fields.actionBtn.textContent = "Draw";
+    fields.actionBtn.classList.remove("clicked");
+
+    fields.maxXInput.disabled = false;
+    fields.maxYInput.disabled = false;
+    fields.maxXInput.value = "";
+    fields.maxYInput.value = "";
             
-    xInput.disabled = true;
-    YInput.disabled = true;
-    xInput.value = "";
-    YInput.value = "";
-    state.drawState = true;
+    fields.xInput.disabled = true;
+    fields.yInput.disabled = true;
+    fields.fillColorInput.disabled = true;
+    fields.xInput.value = "";
+    fields.yInput.value = "";
+    fields.fillColorInput.value = "#8A2BE2";
+    states.drawState = true;
 }
-
-
-
 
 
 
