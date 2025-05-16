@@ -2,7 +2,6 @@ const addNewBtn = document.getElementById('add-new-btn');
 const templatesContainer = document.getElementById('templates-container');
 
 addNewBtn.addEventListener("click", () => {
-
     // getting count of each templates 
     let maxCount = 0;
     templatesContainer.querySelectorAll('.container').forEach(el => {
@@ -10,7 +9,7 @@ addNewBtn.addEventListener("click", () => {
         if(count > maxCount) maxCount = count;
     })
     const currentCount = maxCount + 1;
-    
+
     const newTemplate = document.createElement("div");
     newTemplate.classList.add('container');
     newTemplate.dataset.count = currentCount;
@@ -31,6 +30,10 @@ addNewBtn.addEventListener("click", () => {
                     <div class="input-container">
                         <p>max-Y:</p>
                         <input class="input-box max-Y-input" type="number" min="1"/>
+                    </div>
+                    <div class="input-container">
+                        <p>gap:</p>
+                        <input class="input-box gap-input" type="number" min="1"/>
                     </div>
                     <div class="input-container">
                         <p>x-axis:</p>
@@ -72,12 +75,14 @@ addNewBtn.addEventListener("click", () => {
     const resetBtn = newTemplate.querySelector('.reset-btn');
     const removeTemplateBtn = newTemplate.querySelector('.remove-template-btn');
     
+    // mark inputs 
     const maxXInput = newTemplate.querySelector('.max-X-input');
     const maxYInput = newTemplate.querySelector('.max-Y-input');
+    const gridGapInput = newTemplate.querySelector('.gap-input');
 
+    // draw inputs
     const xInput = newTemplate.querySelector('.x-axis-input');
     const yInput = newTemplate.querySelector('.y-axis-input');
-
     const fillColorInput = newTemplate.querySelector('.fill-color-input');
 
     // assigning same objects to a variable and both refers to the same memory
@@ -93,15 +98,41 @@ addNewBtn.addEventListener("click", () => {
         maxYInput,
         xInput,
         yInput,
-        fillColorInput
+        fillColorInput,
+        gridGapInput
     }
+
+    // const fields = {
+    //     drawFields : {
+
+    //     },
+    //     markFields : {
+
+    //     }
+    // }
+
     const inputs = {
         maxX: null,
         maxY: null,
+        gap: null,
         xToPlot: null,
         yToPlot: null,
         fillColor: null,
+        minCellSize: 10,
+        maxCellSize: 50,
     }
+
+    // const inputs = {
+    //     drawInputs : {
+    //         maxX: null,
+    //         maxY: null,
+    //     },
+    //     markInputs : {
+    //         xToPlot: null,
+    //         yToPlot : null, 
+    //         fillColor : null
+    //     }
+    // }
 
     // final object which is passed into functions
     const allConfigObj = {
@@ -124,6 +155,7 @@ addNewBtn.addEventListener("click", () => {
         inputs.xToPlot = xInput.value;
         inputs.yToPlot = yInput.value;
         inputs.fillColor = fillColorInput.value;
+        inputs.gap = Number(gridGapInput.value);
 
         // calling function based on states 
         if(states.drawState) {
@@ -185,8 +217,9 @@ function draw({inputs, fields, states}) {
 
     // in grid rows and columns are flipping
     fields.gridContainer.style.display = 'grid';
-    fields.gridContainer.style.gridTemplateRows = `repeat(${inputs.maxY}, minmax(10px, 50px))`;
-    fields.gridContainer.style.gridTemplateColumns = `repeat(${inputs.maxX}, minmax(10px, 50px))`;
+    fields.gridContainer.style.gridTemplateRows = `repeat(${inputs.maxY}, minmax(${inputs.minCellSize}px, ${inputs.maxCellSize}px))`;
+    fields.gridContainer.style.gridTemplateColumns = `repeat(${inputs.maxX}, minmax(${inputs.minCellSize}px, ${inputs.maxCellSize}px))`;
+    fields.gridContainer.style.columnGap = `${inputs.gap}px`;
     fields.gridContainer.innerHTML = "";
 
     // populating with blocks 
@@ -203,6 +236,7 @@ function draw({inputs, fields, states}) {
     fields.actionBtn.textContent = "Mark";
     fields.maxXInput.disabled = true;
     fields.maxYInput.disabled = true;
+    fields.gridGapInput.disabled = true;
 
     fields.xInput.disabled = false;
     fields.yInput.disabled = false;
@@ -238,9 +272,21 @@ function mark({inputs, fields, states}) {
     // only mark if these conditions met
     if(x!== null && y!== null && (x < inputs.maxX) && (y < inputs.maxY)) {
         
-        for(let i = 0; i <= y; i++) {
-            const blockToColor = fields.gridContainer.querySelector(`[data-xy = "${x},${i}"]`);
-            blockToColor.style.backgroundColor = `${inputs.fillColor}`;
+        // for(let i = 0; i <= y; i++) {
+        //     const blockToColor = fields.gridContainer.querySelector(`[data-xy = "${x},${i}"]`);
+        //     blockToColor.style.backgroundColor = `${inputs.fillColor}`;
+        // }
+
+        const styleObj = {
+            // border: "2px solid #fff",
+            borderRadius: "4px",
+            opacity: "0.9",
+            backgroundColor: inputs.fillColor
+        };
+
+        // creating markers
+        for(let i = 0; i<= y; i++) {
+            createMarker(x, i, fields.gridContainer, styleObj);
         }
         
         fields.actionBtn.textContent = "Clear";
@@ -254,13 +300,33 @@ function mark({inputs, fields, states}) {
     }
 }
 
+// -----------marker function-------------------
+function createMarker(x, y, container, styleObj){
+    const cell = container.querySelector(`[data-xy='${x},${y}']`);
+    if(cell) {
+        const marker = document.createElement("div");
+        marker.classList.add('marker-block');
+
+        // adding dynamic styles to the element style object
+        Object.assign(marker.style, styleObj);
+
+        cell.appendChild(marker);
+    }
+}
+
 // ------------clear function--------------------
 function clear({inputs, fields, states}) {
     // console.log(inputs, fields, states)
 
+    // for(let i = 0; i <= inputs.yToPlot; i++) {
+    //     const blockToColor = fields.gridContainer.querySelector(`[data-xy = "${inputs.xToPlot},${i}"]`);
+    //     blockToColor.style.backgroundColor = "";
+    // }
+
+    // clearing markers 
     for(let i = 0; i <= inputs.yToPlot; i++) {
-        const blockToColor = fields.gridContainer.querySelector(`[data-xy = "${inputs.xToPlot},${i}"]`);
-        blockToColor.style.backgroundColor = "";
+        const cell = fields.gridContainer.querySelector(`[data-xy = "${inputs.xToPlot},${i}"]`); 
+        cell.querySelector('.marker-block').remove();
     }
 
     fields.actionBtn.textContent = "Mark";
@@ -287,8 +353,10 @@ function resetState({inputs, fields, states}) {
 
     fields.maxXInput.disabled = false;
     fields.maxYInput.disabled = false;
+    fields.gridGapInput.disabled = false;
     fields.maxXInput.value = "";
     fields.maxYInput.value = "";
+    fields.gridGapInput.value = "";
             
     fields.xInput.disabled = true;
     fields.yInput.disabled = true;
@@ -298,8 +366,6 @@ function resetState({inputs, fields, states}) {
     fields.fillColorInput.value = "#000000";
     states.drawState = true;
 }
-
-
 
 // ----------------------------------------------old code -----------------------------------------
 // const gridContainer = document.querySelector(".grid-container");
