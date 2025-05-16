@@ -2,12 +2,27 @@ const addNewBtn = document.getElementById('add-new-btn');
 const templatesContainer = document.getElementById('templates-container');
 
 addNewBtn.addEventListener("click", () => {
+
+    // getting count of each templates 
+    let maxCount = 0;
+    templatesContainer.querySelectorAll('.container').forEach(el => {
+        const count = parseInt(el.dataset.count || "0", 10);
+        if(count > maxCount) maxCount = count;
+    })
+    const currentCount = maxCount + 1;
+    
     const newTemplate = document.createElement("div");
     newTemplate.classList.add('container');
+    newTemplate.dataset.count = currentCount;
     newTemplate.innerHTML = `
-         <div class="top-section">
+        <div class="top-section">
+            <div class="graph-details">
+                <p class="graph-name">graph template ${currentCount}</p>
+                <button class="remove-template-btn">
+                    <i class="bi bi-trash3"></i>
+                </button>
+            </div>
             <div class="inputs-container">
-
                 <div class="input-group">
                     <div class="input-container">
                         <p>max-X:</p>
@@ -27,7 +42,7 @@ addNewBtn.addEventListener("click", () => {
                     </div>
                     <div class="input-container">
                         <p>fill-color:</p>
-                        <input class="input-box fill-color-input" type="color" value="#8A2BE2"/>
+                        <input class="input-box fill-color-input" type="color" value="#000000"/>
                     </div>
                 </div>
                 
@@ -41,7 +56,7 @@ addNewBtn.addEventListener("click", () => {
             <diV>
                 <button class="btn reset-btn">
                     <i class="bi bi-arrow-clockwise"></i>
-                    <span>Reset</span>
+                    <span>reset</span>
                 </button>
             </diV>
             <div class="grid-scrollable-container">
@@ -55,6 +70,7 @@ addNewBtn.addEventListener("click", () => {
     const gridContainer = newTemplate.querySelector('.grid-container');
     const actionBtn = newTemplate.querySelector('.action-btn');
     const resetBtn = newTemplate.querySelector('.reset-btn');
+    const removeTemplateBtn = newTemplate.querySelector('.remove-template-btn');
     
     const maxXInput = newTemplate.querySelector('.max-X-input');
     const maxYInput = newTemplate.querySelector('.max-Y-input');
@@ -149,6 +165,13 @@ addNewBtn.addEventListener("click", () => {
             alert("nothing to reset!");
         }
     });
+
+    // ------------remove template btn -----------------------
+    removeTemplateBtn.addEventListener("click", () => {
+        const containerToRemove = removeTemplateBtn.closest('.container');
+        console.log(containerToRemove)
+        containerToRemove.remove();
+    })
 })
 
 // ----------------draw function------------------------
@@ -178,7 +201,6 @@ function draw({inputs, fields, states}) {
     }
 
     fields.actionBtn.textContent = "Mark";
-    fields.actionBtn.classList.add("clicked");
     fields.maxXInput.disabled = true;
     fields.maxYInput.disabled = true;
 
@@ -222,6 +244,9 @@ function mark({inputs, fields, states}) {
         }
         
         fields.actionBtn.textContent = "Clear";
+        fields.xInput.disabled = true;
+        fields.yInput.disabled = true;
+        fields.fillColorInput.disabled = true;
 
         // changing states
         states.markState = false;
@@ -241,7 +266,11 @@ function clear({inputs, fields, states}) {
     fields.actionBtn.textContent = "Mark";
     fields.xInput.value = '';
     fields.yInput.value = '';
-    fields.fillColorInput.value = '#8A2BE2';
+    fields.fillColorInput.value = '#000000';
+    fields.xInput.disabled = false;
+    fields.yInput.disabled = false;
+    fields.fillColorInput.disabled = false;
+
 
     // changing states
     states.clearState = false;
@@ -255,7 +284,6 @@ function resetState({inputs, fields, states}) {
     fields.gridContainer.innerHTML = "";
     fields.gridContainer.style.display = 'none';
     fields.actionBtn.textContent = "Draw";
-    fields.actionBtn.classList.remove("clicked");
 
     fields.maxXInput.disabled = false;
     fields.maxYInput.disabled = false;
@@ -267,7 +295,7 @@ function resetState({inputs, fields, states}) {
     fields.fillColorInput.disabled = true;
     fields.xInput.value = "";
     fields.yInput.value = "";
-    fields.fillColorInput.value = "#8A2BE2";
+    fields.fillColorInput.value = "#000000";
     states.drawState = true;
 }
 

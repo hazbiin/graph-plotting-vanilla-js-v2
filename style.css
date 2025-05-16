@@ -34,6 +34,41 @@ body {
     padding: 10px;
     padding-bottom: 30px;
     border-bottom: 1px solid lightgray;
+    display: flex;
+    flex-direction: column;
+    /* align-items: center; */
+    justify-content: center;
+    gap: 25px;
+}
+.graph-details {
+    display: flex;
+    align-items: center;
+    /* justify-content: space-between; */
+    gap: 20px;
+}
+.graph-name{
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+.remove-template-btn{
+    padding: 8px 8px;
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 0 10px rgba(86, 86, 86, 0.071);
+    background-color: black;
+    color: white;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    white-space: nowrap;
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
 }
 .inputs-container{
     display: flex;
@@ -57,7 +92,6 @@ body {
 .input-container:nth-child(2) {
     padding-right: 30px;
 }
-
 .input-label {
     font-size: 14px;
     white-space: nowrap;
@@ -83,6 +117,15 @@ body {
     letter-spacing: 1px;
     cursor: pointer;
     outline: none;
+}
+.reset-btn {
+    padding: 5px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-size: 14px;
+    letter-spacing: 1px;
 }
 .action-btn.clicked {
     background-color: blueviolet;
