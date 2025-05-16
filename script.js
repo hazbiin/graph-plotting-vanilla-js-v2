@@ -22,37 +22,39 @@ addNewBtn.addEventListener("click", () => {
                 </button>
             </div>
             <div class="inputs-container">
-                <div class="input-group">
-                    <div class="input-container">
-                        <p>max-X:</p>
-                        <input class="input-box max-X-input" type="number" min="1"/>
+                <div class="input-outer-group">
+                    <div class="input-group">
+                        <div class="input-container">
+                            <p>max-X:</p>
+                            <input class="input-box max-X-input" type="number" min="1"/>
+                        </div>
+                        <div class="input-container">
+                            <p>max-Y:</p>
+                            <input class="input-box max-Y-input" type="number" min="1"/>
+                        </div>
+                        <div class="input-container">
+                            <p>gap:</p>
+                            <input class="input-box gap-input" type="number" min="1"/>
+                        </div>
                     </div>
-                    <div class="input-container">
-                        <p>max-Y:</p>
-                        <input class="input-box max-Y-input" type="number" min="1"/>
-                    </div>
-                    <div class="input-container">
-                        <p>gap:</p>
-                        <input class="input-box gap-input" type="number" min="1"/>
-                    </div>
-                    <div class="input-container">
-                        <p>x-axis:</p>
-                        <input class="input-box x-axis-input" type="number"/>
-                    </div>
-                    <div class="input-container">
-                        <p>y-axis:</p>
-                        <input class="input-box y-axis-input" type="number"/>
-                    </div>
-                    <div class="input-container">
-                        <p>fill-color:</p>
-                        <input class="input-box fill-color-input" type="color" value="#000000"/>
+                    <div class="input-group">
+                        <div class="input-container">
+                            <p>x-axis:</p>
+                            <input class="input-box x-axis-input" type="number"/>
+                        </div>
+                        <div class="input-container">
+                            <p>y-axis:</p>
+                            <input class="input-box y-axis-input" type="number"/>
+                        </div>
+                        <div class="input-container">
+                            <p>fill-color:</p>
+                            <input class="input-box fill-color-input" type="color" value="#8A2BE2"/>
+                        </div>
                     </div>
                 </div>
-                
                 <div class="input-group">
                     <button class="btn action-btn">Draw</button>
                 </div>
-                
             </div>
         </div>
         <div class="bottom-section">
@@ -101,16 +103,6 @@ addNewBtn.addEventListener("click", () => {
         fillColorInput,
         gridGapInput
     }
-
-    // const fields = {
-    //     drawFields : {
-
-    //     },
-    //     markFields : {
-
-    //     }
-    // }
-
     const inputs = {
         maxX: null,
         maxY: null,
@@ -122,6 +114,8 @@ addNewBtn.addEventListener("click", () => {
         maxCellSize: 50,
     }
 
+
+    // can refactor later /////////////
     // const inputs = {
     //     drawInputs : {
     //         maxX: null,
@@ -131,6 +125,14 @@ addNewBtn.addEventListener("click", () => {
     //         xToPlot: null,
     //         yToPlot : null, 
     //         fillColor : null
+    //     }
+    // }
+    // const fields = {
+    //     drawFields : {
+
+    //     },
+    //     markFields : {
+
     //     }
     // }
 
@@ -201,7 +203,6 @@ addNewBtn.addEventListener("click", () => {
     // ------------remove template btn -----------------------
     removeTemplateBtn.addEventListener("click", () => {
         const containerToRemove = removeTemplateBtn.closest('.container');
-        console.log(containerToRemove)
         containerToRemove.remove();
     })
 })
@@ -268,7 +269,7 @@ function mark({inputs, fields, states}) {
         alert("x or y point does not includes in the grid generated");
         return;
     }
-
+    
     // only mark if these conditions met
     if(x!== null && y!== null && (x < inputs.maxX) && (y < inputs.maxY)) {
         
@@ -277,16 +278,32 @@ function mark({inputs, fields, states}) {
         //     blockToColor.style.backgroundColor = `${inputs.fillColor}`;
         // }
 
-        const styleObj = {
-            // border: "2px solid #fff",
-            borderRadius: "4px",
-            opacity: "0.9",
-            backgroundColor: inputs.fillColor
-        };
-
         // creating markers
         for(let i = 0; i<= y; i++) {
-            createMarker(x, i, fields.gridContainer, styleObj);
+            setTimeout(() => {
+                let styleObj = {
+                    // border: "2px solid #fff",
+                    // borderRadius: "4px",
+                    // borderLeft: "2px solid #000",
+                    // borderRight: "2px solid #000",
+                    opacity: "0.9",
+                    width: "75%",
+                    backgroundColor: inputs.fillColor,
+                };
+
+                // individual cell styling
+                const isTopMarker = (i === y);
+                if(isTopMarker) {
+                    Object.assign(styleObj, {
+                        borderTopLeftRadius: "4px",
+                        borderTopRightRadius: "4px",
+                        // borderTop: "2px solid #000",
+                        marginTop:"5px",
+                    });
+                }
+
+                createMarker(x, i, fields.gridContainer, styleObj, isTopMarker);
+            }, i * 100);
         }
         
         fields.actionBtn.textContent = "Clear";
@@ -301,8 +318,9 @@ function mark({inputs, fields, states}) {
 }
 
 // -----------marker function-------------------
-function createMarker(x, y, container, styleObj){
+function createMarker(x, y, container, styleObj, isTopMarker){
     const cell = container.querySelector(`[data-xy='${x},${y}']`);
+
     if(cell) {
         const marker = document.createElement("div");
         marker.classList.add('marker-block');
@@ -311,6 +329,20 @@ function createMarker(x, y, container, styleObj){
         Object.assign(marker.style, styleObj);
 
         cell.appendChild(marker);
+    }
+
+    // taking away cell border
+    // if(y === 0 && x) {
+    //     cell.style.borderTop = "unset";
+    // }
+
+    // if(!isTopMarker) {
+        
+    // }
+    
+     if(y !== 0 && !isTopMarker) {
+        cell.style.borderBottom = "unset";
+        cell.style.borderTop = "unset";
     }
 }
 
@@ -332,7 +364,7 @@ function clear({inputs, fields, states}) {
     fields.actionBtn.textContent = "Mark";
     fields.xInput.value = '';
     fields.yInput.value = '';
-    fields.fillColorInput.value = '#000000';
+    fields.fillColorInput.value = '#8A2BE2';
     fields.xInput.disabled = false;
     fields.yInput.disabled = false;
     fields.fillColorInput.disabled = false;
@@ -363,9 +395,10 @@ function resetState({inputs, fields, states}) {
     fields.fillColorInput.disabled = true;
     fields.xInput.value = "";
     fields.yInput.value = "";
-    fields.fillColorInput.value = "#000000";
+    fields.fillColorInput.value = "#8A2BE2";
     states.drawState = true;
 }
+
 
 // ----------------------------------------------old code -----------------------------------------
 // const gridContainer = document.querySelector(".grid-container");

@@ -70,6 +70,12 @@ body {
     justify-content: center;
     gap: 5px;
 }
+.input-outer-group{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+}
 .inputs-container{
     display: flex;
     flex-direction: column;
@@ -88,9 +94,6 @@ body {
     align-items: center;
     justify-content: center;
     gap: 10px;
-}
-.input-container:nth-child(3) {
-    padding-right: 30px;
 }
 .input-label {
     font-size: 14px;
@@ -146,7 +149,7 @@ body {
 }
 .block{
     position: relative;
-    border: 1px solid black;
+    border: 0.5px solid black;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -154,13 +157,30 @@ body {
 }
 .marker-block {
     position: absolute;
-    /* top: 0;
-    left: 0;
+    top: 0;
     bottom: 0;
-    right: 0; */
-    width: 80%;
-    height: 100%;
+
+    /* animation styles----- */
+    transform-origin: bottom;
+    animation-name: growFromBottom;
+    animation-duration: 0.2s;
+    animation-timing-function: ease-out;
+    animation-fill-mode: forwards; 
 }
+
+@keyframes growFromBottom {
+    0% {
+        transform: scaleY(0);
+        opacity: 0;
+        transform-origin: bottom;
+    }
+    100% {
+        transform: scaleY(1);
+        opacity: 0.9;
+        transform-origin: bottom;
+    }
+}
+
 
 @media screen and (min-width:768px){
     .inputs-container {
@@ -172,5 +192,15 @@ body {
     }
 }
 
-
-/* jkjjkjjjkj */
+@media screen and (min-width: 1400px) {
+    .input-label{
+        font-size: 16px;
+    }
+    .input-box {
+        width: 55px;
+        padding: 10px;
+    }
+    .fill-color-input{
+        padding: 5px;
+    }
+}

@@ -22,32 +22,40 @@
                     <span>remove template</span>
                 </button>
             </div>
-
             <div class="inputs-container">
-
-                <div class="input-group">
-                    <div class="input-container">
-                        <p>max-X:</p>
-                        <input class="input-box" id="max-X-input" type="number" min="1"/>
+                <div class="input-outer-group">
+                    <div class="input-group">
+                        <div class="input-container">
+                            <p>max-X:</p>
+                            <input class="input-box max-X-input" type="number" min="1"/>
+                        </div>
+                        <div class="input-container">
+                            <p>max-Y:</p>
+                            <input class="input-box max-Y-input" type="number" min="1"/>
+                        </div>
+                        <div class="input-container">
+                            <p>gap:</p>
+                            <input class="input-box gap-input" type="number" min="1"/>
+                        </div>
                     </div>
-                    <div class="input-container">
-                        <p>max-Y:</p>
-                        <input class="input-box" id="max-Y-input" type="number" min="1"/>
-                    </div>
-                    <div class="input-container">
-                        <p>x-axis:</p>
-                        <input class="input-box" id="x-axis-input" type="number"/>
-                    </div>
-                    <div class="input-container">
-                        <p>y-axis:</p>
-                        <input class="input-box" id="y-axis-input" type="number"/>
+                    <div class="input-group">
+                        <div class="input-container">
+                            <p>x-axis:</p>
+                            <input class="input-box x-axis-input" type="number"/>
+                        </div>
+                        <div class="input-container">
+                            <p>y-axis:</p>
+                            <input class="input-box y-axis-input" type="number"/>
+                        </div>
+                        <div class="input-container">
+                            <p>fill-color:</p>
+                            <input class="input-box fill-color-input" type="color" value="#8A2BE2"/>
+                        </div>
                     </div>
                 </div>
-                
                 <div class="input-group">
                     <button class="btn action-btn" id="draw-mark-clear-btn">Draw</button>
                 </div>
-                
             </div>
         </div>
         <div class="bottom-section">
