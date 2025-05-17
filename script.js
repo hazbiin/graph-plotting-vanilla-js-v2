@@ -48,7 +48,7 @@ addNewBtn.addEventListener("click", () => {
                         </div>
                         <div class="input-container">
                             <p>fill-color:</p>
-                            <input class="input-box fill-color-input" type="color" value="#8A2BE2"/>
+                            <input class="input-box fill-color-input" type="color" value="#d6e22c"/>
                         </div>
                     </div>
                 </div>
@@ -286,7 +286,7 @@ function mark({inputs, fields, states}) {
                     // borderRadius: "4px",
                     // borderLeft: "2px solid #000",
                     // borderRight: "2px solid #000",
-                    opacity: "0.9",
+                    opacity: "0.7",
                     width: "75%",
                     backgroundColor: inputs.fillColor,
                 };
@@ -302,7 +302,7 @@ function mark({inputs, fields, states}) {
                     });
                 }
 
-                createMarker(x, i, fields.gridContainer, styleObj, isTopMarker);
+                createMarker(x, i, fields.gridContainer, styleObj, i , y);
             }, i * 100);
         }
         
@@ -318,31 +318,29 @@ function mark({inputs, fields, states}) {
 }
 
 // -----------marker function-------------------
-function createMarker(x, y, container, styleObj, isTopMarker){
+function createMarker(x, y, container, styleObj, currentRow, topRow){
     const cell = container.querySelector(`[data-xy='${x},${y}']`);
+    if(!cell) return;
 
-    if(cell) {
-        const marker = document.createElement("div");
-        marker.classList.add('marker-block');
+    const marker = document.createElement("div");
+    marker.classList.add('marker-block');
+    Object.assign(marker.style, styleObj);
+    cell.appendChild(marker);
 
-        // adding dynamic styles to the element style object
-        Object.assign(marker.style, styleObj);
+    // removing cell borders
+    const isTop = (currentRow === topRow);
+    const isBottom = (currentRow === 0);
+    const isMiddle = !isTop && !isBottom;
 
-        cell.appendChild(marker);
-    }
-
-    // taking away cell border
-    // if(y === 0 && x) {
-    //     cell.style.borderTop = "unset";
-    // }
-
-    // if(!isTopMarker) {
-        
-    // }
-    
-     if(y !== 0 && !isTopMarker) {
+    if(isTop) {
         cell.style.borderBottom = "unset";
-        cell.style.borderTop = "unset";
+    }
+    if(isMiddle) {
+        cell.style.borderTop = 'unset';
+        cell.style.borderBottom = 'unset';
+    }
+    if(isBottom) {
+        cell.style.borderTop = 'unset';
     }
 }
 
@@ -359,12 +357,14 @@ function clear({inputs, fields, states}) {
     for(let i = 0; i <= inputs.yToPlot; i++) {
         const cell = fields.gridContainer.querySelector(`[data-xy = "${inputs.xToPlot},${i}"]`); 
         cell.querySelector('.marker-block').remove();
+        cell.style.borderTop = '0.5px solid black';
+        cell.style.borderBottom = '0.5px solid black';
     }
 
     fields.actionBtn.textContent = "Mark";
     fields.xInput.value = '';
     fields.yInput.value = '';
-    fields.fillColorInput.value = '#8A2BE2';
+    fields.fillColorInput.value = '#d6e22c';
     fields.xInput.disabled = false;
     fields.yInput.disabled = false;
     fields.fillColorInput.disabled = false;
@@ -395,7 +395,7 @@ function resetState({inputs, fields, states}) {
     fields.fillColorInput.disabled = true;
     fields.xInput.value = "";
     fields.yInput.value = "";
-    fields.fillColorInput.value = "#8A2BE2";
+    fields.fillColorInput.value = "#d6e22c";
     states.drawState = true;
 }
 
